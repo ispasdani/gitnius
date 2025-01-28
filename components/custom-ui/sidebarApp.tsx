@@ -16,9 +16,22 @@ import { Bot, CreditCard, LayoutDashboard, Presentation } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Button } from "../ui/button";
 
 const SidebarApp = () => {
   const pathname = usePathname();
+
+  const projects = [
+    {
+      name: "Project 1",
+    },
+    {
+      name: "Project 2",
+    },
+    {
+      name: "Project 3",
+    },
+  ];
 
   const items = [
     {
@@ -67,6 +80,44 @@ const SidebarApp = () => {
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Your Projects</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {projects.map((project) => {
+                return (
+                  <SidebarMenuItem key={project.name}>
+                    <SidebarMenuButton asChild>
+                      <div>
+                        {" "}
+                        <div
+                          className={cn(
+                            "rounded-sm border size-6 flex items-center justify-center text-sm bg-white text-primary",
+                            {
+                              "bg-primary text-white": true,
+                            }
+                          )}
+                        >
+                          {project.name[0]}
+                        </div>
+                        <span>{project.name}</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+              <div className="h-2"></div>
+              <SidebarMenuItem>
+                <Link href={"/create"}>
+                  <Button size={"sm"} variant={"outline"} className="w-fit">
+                    Create Project
+                  </Button>
+                </Link>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
