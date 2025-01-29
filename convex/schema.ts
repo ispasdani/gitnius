@@ -30,4 +30,14 @@ export default defineSchema({
     messageFive: v.string(),
     messageSix: v.string(),
   }),
+  project: defineTable({
+    userId: v.id("users"),
+    role: v.string(),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+    projectName: v.string(),
+    githubUrl: v.string(),
+    deletedAt: v.string(),
+    sharedWith: v.record(v.id("users"), v.string()),
+  }),
 });
