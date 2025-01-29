@@ -37,6 +37,7 @@ export default defineSchema({
     updatedAt: v.string(),
     projectName: v.string(),
     githubUrl: v.string(),
+    githubToken: v.string(),
     deletedAt: v.string(),
     sharedWith: v.record(v.id("users"), v.string()),
   }),
