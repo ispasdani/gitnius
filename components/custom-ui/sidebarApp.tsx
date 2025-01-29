@@ -11,15 +11,19 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "../ui/sidebar";
 import { Bot, CreditCard, LayoutDashboard, Presentation } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 const SidebarApp = () => {
   const pathname = usePathname();
+
+  const { open } = useSidebar();
 
   const projects = [
     {
@@ -57,7 +61,14 @@ const SidebarApp = () => {
   ];
   return (
     <Sidebar collapsible="icon" variant="floating">
-      <SidebarHeader>Logo</SidebarHeader>
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+          {/* <Image src={""} width={24} height={24} alt="App logo" /> */}
+          {open && (
+            <h1 className="text-xl font-bold text-primary/80">GitNius</h1>
+          )}
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
