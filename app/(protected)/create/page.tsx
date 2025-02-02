@@ -3,22 +3,79 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import React from "react";
-import { useForm } from "react-hook-form";
-
-type FormInput = {
-  repoUrl: string;
-  projectName: string;
-  githubToken?: string;
-};
+import React, { useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { Plus } from "lucide-react"; // Ensure you have lucide-react installed
+import { useUser } from "@clerk/nextjs";
+import LoadingSpinner from "@/components/custom-ui/loadingSpinner";
+import { useMutation } from "convex/react";
+import { FormInput } from "./types";
+import { api } from "@/convex/_generated/api";
+import { useToast } from "@/hooks/use-toast";
 
 const CreatePage = () => {
-  const { register, handleSubmit, reset } = useForm<FormInput>();
+  // Get the user's authentication state.
+  const { user, isLoaded } = useUser();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  function onSubmit(data: FormInput) {
-    window.alert(JSON.stringify(data));
-    return true;
+  // Initialize the form with default values.
+  const { register, handleSubmit, control } = useForm<FormInput>({
+    defaultValues: {
+      sharedWith: [],
+    },
+  });
+
+  // Manage dynamic email inputs.
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "sharedWith",
+  });
+
+  // Get the createProject mutation.
+  const createProjectMutation = useMutation(api.project.createProject);
+
+  // Always call hooks; conditionally render content only after hooks have run.
+  if (!isLoaded) {
+    return <LoadingSpinner />;
   }
+  if (!user) {
+    return <div>Please sign in to create a project.</div>;
+  }
+
+  // onSubmit: transform the form data into the payload for the mutation.
+  const onSubmit = async (data: FormInput) => {
+    // Transform the array of shared emails into a record.
+    // Here each email gets a default role of "member".
+    const sharedWithRecord: Record<string, string> = {};
+    data.sharedWith.forEach((item) => {
+      const email = item.email.trim();
+      if (email) {
+        sharedWithRecord[email] = "member";
+      }
+    });
+
+    // Prepare the payload, mapping repoUrl to githubUrl.
+    const payload = {
+      projectName: data.projectName,
+      githubUrl: data.repoUrl,
+      githubToken: data.githubToken,
+      sharedWith: sharedWithRecord,
+    };
+
+    try {
+      setIsSubmitting(true);
+      // Call the mutation with the payload.
+      // const result = await createProjectMutation(payload);
+      window.alert("working");
+      toast({ title: "Project created successfully", variant: "success" });
+      setIsSubmitting(false);
+    } catch (error: any) {
+      console.log(error);
+      toast({ title: "Error on submitting the form", variant: "destructive" });
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex items-center gap-12 h-full justify-center">
@@ -38,7 +95,7 @@ const CreatePage = () => {
             Enter the URL of your repository to link it to GitNius
           </p>
         </div>
-        <div className="h-4"></div>
+        <div className="h-4" />
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Input
@@ -46,18 +103,45 @@ const CreatePage = () => {
               placeholder="Project Name"
               required
             />
-            <div className="h-2"></div>
+            <div className="h-2" />
             <Input
               {...register("repoUrl", { required: true })}
               placeholder="Github URL"
               required
             />
-            <div className="h-2"></div>
+            <div className="h-2" />
             <Input
               {...register("githubToken")}
               placeholder="Github Token (Optional)"
             />
-            <div className="h-4"></div>
+            <div className="h-2" />
+            {/* Shared With Section */}
+            <div className="w-full">
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex items-center gap-2">
+                  <Input
+                    {...register(`sharedWith.${index}.email` as const)}
+                    placeholder="Share With (Optional)"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => remove(index)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button
+                className="w-full"
+                type="button"
+                onClick={() => append({ email: "" })}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Email To Share
+              </Button>
+            </div>
+            <div className="h-2" />
             <Button type="submit">Create Project</Button>
           </form>
         </div>

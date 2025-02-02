@@ -1,8 +1,8 @@
 import { ConvexError, v } from "convex/values";
 
-import { internalMutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
-export const createProject = internalMutation({
+export const createProject = mutation({
   args: {
     projectName: v.string(),
     githubUrl: v.string(), // Required GitHub URL
