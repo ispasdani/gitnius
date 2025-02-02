@@ -19,23 +19,14 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { useProjects } from "@/hooks/useProjects";
 
 const SidebarApp = () => {
   const pathname = usePathname();
 
   const { open } = useSidebar();
 
-  const projects = [
-    {
-      name: "Project 1",
-    },
-    {
-      name: "Project 2",
-    },
-    {
-      name: "Project 3",
-    },
-  ];
+  const { projects, projectId, setProjectId, project } = useProjects();
 
   const items = [
     {
@@ -59,6 +50,7 @@ const SidebarApp = () => {
       icon: CreditCard,
     },
   ];
+
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader>
@@ -99,28 +91,31 @@ const SidebarApp = () => {
           <SidebarGroupLabel>Your Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {projects.map((project) => {
-                return (
-                  <SidebarMenuItem key={project.name}>
-                    <SidebarMenuButton asChild>
-                      <div>
-                        {" "}
-                        <div
-                          className={cn(
-                            "rounded-sm border size-6 flex items-center justify-center text-sm bg-white text-primary",
-                            {
-                              "bg-primary text-white": true,
-                            }
-                          )}
-                        >
-                          {project.name[0]}
+              {projects
+                ?.filter((project) => project.role === "owner")
+                .map((project) => {
+                  return (
+                    <SidebarMenuItem key={project._id}>
+                      <SidebarMenuButton asChild>
+                        <div onClick={() => setProjectId(project._id)}>
+                          <div
+                            className={cn(
+                              "rounded-sm border size-6 flex items-center justify-center text-sm bg-white text-primary",
+                              {
+                                "bg-primary text-white":
+                                  project._id === projectId,
+                              }
+                            )}
+                          >
+                            {project.projectName[0]}
+                          </div>
+                          <span>{project.projectName}</span>
                         </div>
-                        <span>{project.name}</span>
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+
               <div className="h-2"></div>
               <SidebarMenuItem>
                 <Link href={"/create"}>

@@ -66,12 +66,11 @@ const CreatePage = () => {
     try {
       setIsSubmitting(true);
       // Call the mutation with the payload.
-      // const result = await createProjectMutation(payload);
-      window.alert("working");
+      const result = await createProjectMutation(payload);
+
       toast({ title: "Project created successfully", variant: "success" });
       setIsSubmitting(false);
     } catch (error: any) {
-      console.log(error);
       toast({ title: "Error on submitting the form", variant: "destructive" });
       setIsSubmitting(false);
     }
@@ -118,7 +117,10 @@ const CreatePage = () => {
             {/* Shared With Section */}
             <div className="w-full">
               {fields.map((field, index) => (
-                <div key={field.id} className="flex items-center gap-2">
+                <div
+                  key={field.id}
+                  className="flex items-center gap-2 mb-[0.5rem]"
+                >
                   <Input
                     {...register(`sharedWith.${index}.email` as const)}
                     placeholder="Share With (Optional)"
@@ -132,6 +134,7 @@ const CreatePage = () => {
                   </Button>
                 </div>
               ))}
+              <div className="h-2" />
               <Button
                 className="w-full"
                 type="button"

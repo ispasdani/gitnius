@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const createProject = mutation({
   args: {
@@ -42,5 +42,52 @@ export const createProject = mutation({
     });
 
     return { projectId };
+  },
+});
+
+// Query to get all projects for a user (either owned or shared with)
+export const getUserProjects = query({
+  args: { clerkId: v.string() },
+  async handler(ctx, args) {
+    // 1. Look up the user by clerkId.
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
+      .unique();
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+
+    // 2. Query projects where the user is the owner.
+    const ownedProjects = await ctx.db
+      .query("project")
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .collect();
+
+    // 3. Query candidate projects that have a non-empty sharedWith record.
+    const sharedCandidates = await ctx.db
+      .query("project")
+      .filter((q) => q.not(q.eq(q.field("sharedWith"), {})))
+      .collect();
+
+    // 4. Filter the candidate projects in memory to only include those
+    //    where the sharedWith record has a property equal to the user's email.
+    const sharedProjects = sharedCandidates.filter((project) => {
+      return (
+        project.sharedWith &&
+        Object.prototype.hasOwnProperty.call(project.sharedWith, user.email)
+      );
+    });
+
+    // 5. Merge the two lists, avoiding duplicates.
+    const projectMap = new Map();
+    for (const proj of ownedProjects) {
+      projectMap.set(proj._id, proj);
+    }
+    for (const proj of sharedProjects) {
+      projectMap.set(proj._id, proj);
+    }
+
+    return Array.from(projectMap.values());
   },
 });
