@@ -39,6 +39,7 @@ export default defineSchema({
     githubUrl: v.string(),
     githubToken: v.string(),
     deletedAt: v.string(),
-    sharedWith: v.record(v.id("users"), v.string()),
+    // Keys are emails (v.string()) and values are roles (v.string())
+    sharedWith: v.record(v.string(), v.string()),
   }),
 });
