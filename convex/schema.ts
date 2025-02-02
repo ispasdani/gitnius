@@ -8,6 +8,8 @@ export default defineSchema({
     clerkId: v.string(),
     name: v.string(),
     credits: v.number(),
+    linkedInProfile: v.optional(v.string()),
+    githubProfile: v.optional(v.string()),
   }),
   payments: defineTable({
     userId: v.id("users"),
