@@ -86,3 +86,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .font-roboto {
+    font-family: var(--font-roboto-sans), sans-serif;
+  }
+}

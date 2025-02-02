@@ -67,7 +67,6 @@ const CreatePage = () => {
       setIsSubmitting(true);
       // Call the mutation with the payload.
       const result = await createProjectMutation(payload);
-
       toast({ title: "Project created successfully", variant: "success" });
       setIsSubmitting(false);
     } catch (error: any) {

@@ -20,13 +20,15 @@ import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { useProjects } from "@/hooks/useProjects";
+import FullLogo from "./fullLogo";
+import ShortLogo from "../svgs/shortLogo";
 
 const SidebarApp = () => {
   const pathname = usePathname();
 
   const { open } = useSidebar();
 
-  const { projects, projectId, setProjectId, project } = useProjects();
+  const { projects, projectId, setProjectId } = useProjects();
 
   const items = [
     {
@@ -54,11 +56,8 @@ const SidebarApp = () => {
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader>
-        <div className="flex items-center gap-2">
-          {/* <Image src={""} width={24} height={24} alt="App logo" /> */}
-          {open && (
-            <h1 className="text-xl font-bold text-primary/80">GitNius</h1>
-          )}
+        <div className={`flex items-center ${!open && "justify-center"}`}>
+          {open ? <FullLogo /> : <ShortLogo />}
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -95,7 +94,10 @@ const SidebarApp = () => {
                 ?.filter((project) => project.role === "owner")
                 .map((project) => {
                   return (
-                    <SidebarMenuItem key={project._id}>
+                    <SidebarMenuItem
+                      key={project._id}
+                      className="cursor-pointer"
+                    >
                       <SidebarMenuButton asChild>
                         <div onClick={() => setProjectId(project._id)}>
                           <div
